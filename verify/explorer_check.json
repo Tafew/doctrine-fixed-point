@@ -1,0 +1,357 @@
+{
+ "page": "file:///home/claude/p6v3/ghpages/index.html",
+ "rows": [
+  [
+   "England FP",
+   "1",
+   "1.0",
+   "True"
+  ],
+  [
+   "England FP",
+   "1.7650832505970175",
+   "1.7651",
+   "True"
+  ],
+  [
+   "England FP",
+   "4",
+   "4.0",
+   "True"
+  ],
+  [
+   "Germany FP",
+   "1",
+   "1.0",
+   "True"
+  ],
+  [
+   "Germany FP",
+   "1.5313967047011259",
+   "1.5314",
+   "True"
+  ],
+  [
+   "Germany FP",
+   "25",
+   "25.0",
+   "True"
+  ],
+  [
+   "Austria #FP",
+   "1",
+   "1",
+   "True"
+  ],
+  [
+   "Austria FP",
+   "1",
+   "1.0",
+   "True"
+  ],
+  [
+   "lambar=2 FP",
+   "1",
+   "1.0",
+   "True"
+  ],
+  [
+   "lambar=2 FP",
+   "2.2000709779975587",
+   "2.2001",
+   "True"
+  ],
+  [
+   "lambar=2 FP",
+   "2.7999290220024395",
+   "2.7999",
+   "True"
+  ],
+  [
+   "range [0.25,0.55] FP",
+   "1",
+   "1.0",
+   "True"
+  ],
+  [
+   "range [0.25,0.55] FP",
+   "1.8536593552237353",
+   "1.8537",
+   "True"
+  ],
+  [
+   "range [0.25,0.55] FP",
+   "4",
+   "4.0",
+   "True"
+  ],
+  [
+   "range [0.30,0.50] FP",
+   "1",
+   "1.0",
+   "True"
+  ],
+  [
+   "range [0.30,0.50] FP",
+   "1.9313336742481795",
+   "1.9313",
+   "True"
+  ],
+  [
+   "range [0.30,0.50] FP",
+   "4",
+   "4.0",
+   "True"
+  ],
+  [
+   "lambda dagger",
+   "1.9519438352237524",
+   "1.9519",
+   "True"
+  ],
+  [
+   "fold low",
+   "1.6634590064064532",
+   "1.6635",
+   "True"
+  ],
+  [
+   "fold high",
+   "3.0521098865521323",
+   "3.0521",
+   "True"
+  ],
+  [
+   "Maxwell c* (closed)",
+   "2.5",
+   "2.5",
+   "True"
+  ],
+  [
+   "barrier out of compensation",
+   "0.09901807437075705",
+   "0.099018",
+   "True"
+  ],
+  [
+   "barrier out of permissive well",
+   "0.6466559636133015",
+   "0.646656",
+   "True"
+  ],
+  [
+   "log10 recovery sigma=0.05",
+   "34.74581540733875",
+   "34.746",
+   "True"
+  ],
+  [
+   "log10 recovery sigma=0.1",
+   "8.937541291868717",
+   "8.938",
+   "True"
+  ],
+  [
+   "log10 recovery sigma=0.15",
+   "4.158278959642347",
+   "4.158",
+   "True"
+  ],
+  [
+   "log10 recovery sigma=0.2",
+   "2.495992351837315",
+   "2.496",
+   "True"
+  ],
+  [
+   "log10 exit at c* sigma=0.1",
+   "25.73798068277788",
+   "25.74",
+   "True"
+  ],
+  [
+   "log10 exit at c* sigma=0.2",
+   "6.794649337218441",
+   "6.79",
+   "True"
+  ],
+  [
+   "log10 exit at c* sigma=0.2763",
+   "3.807198315719048",
+   "3.81",
+   "True"
+  ],
+  [
+   "c-dagger(sigma=0.1,30)",
+   "3.010010040576483",
+   "3.01",
+   "True"
+  ],
+  [
+   "c-dagger(sigma=0.2,30)",
+   "2.919263723510156",
+   "2.9193",
+   "True"
+  ],
+  [
+   "c-dagger(sigma=0.2763,30)",
+   "2.8329652204541125",
+   "2.833",
+   "True"
+  ],
+  [
+   "fuse t* at 1.0",
+   "2",
+   "2",
+   "True"
+  ],
+  [
+   "fuse t* at 1.5",
+   "3",
+   "3",
+   "True"
+  ],
+  [
+   "fuse t* at 1.7",
+   "4",
+   "4",
+   "True"
+  ],
+  [
+   "fuse t* at 1.74",
+   "5",
+   "5",
+   "True"
+  ],
+  [
+   "fuse t* at 1.76",
+   "8",
+   "8",
+   "True"
+  ],
+  [
+   "fuse t* at 1.764",
+   "10",
+   "10",
+   "True"
+  ],
+  [
+   "fuse t* at 1.765",
+   "14",
+   "14",
+   "True"
+  ],
+  [
+   "fuse at 1.80 reversed",
+   "reversed",
+   "reversed",
+   "True"
+  ],
+  [
+   "admissible edge",
+   "1.6643198385441866",
+   "1.66432",
+   "True"
+  ],
+  [
+   "Maxwell lambar=4 (closed)",
+   "3",
+   "3.0",
+   "True"
+  ],
+  [
+   "Maxwell lambar=2 route",
+   "numerical",
+   "numerical (support not inside at c*)",
+   "True"
+  ],
+  [
+   "start: pressed chips",
+   "['England & India', 'Maxwell point 2.50']",
+   "['England & India', 'Maxwell point 2.50']",
+   "True"
+  ],
+  [
+   "start: sliders",
+   "{'s-lam': 3, 's-c': 2.5, 's-h': 0.2, 's-sg': 0.2, 's-l1': 1.5}",
+   "{'s-lam': 3.0, 's-c': 2.5, 's-h': 0.2, 's-sg': 0.2, 's-l1': 1.5}",
+   "True"
+  ],
+  [
+   "start: shown values",
+   "{'v-lam': '3.00', 'v-c': '2.500', 'v-h': '0.200', 'v-sg': '0.200', 'v-l1': '1.500'}",
+   "{'v-lam': '3.00', 'v-c': '2.500', 'v-h': '0.200', 'v-sg': '0.200', 'v-l1': '1.500'}",
+   "True"
+  ],
+  [
+   "start: regime",
+   "multiple",
+   "multiple",
+   "True"
+  ],
+  [
+   "start: equilibria (population.py)",
+   "1.000 · 2.354 · 4.000",
+   "1.000 · 2.354 · 4.000",
+   "True"
+  ],
+  [
+   "start: watershed (population.py)",
+   "2.354",
+   "2.354",
+   "True"
+  ],
+  [
+   "start: lambar/lambar-dagger (population.py)",
+   "('1.25', '2.403')",
+   "('1.25', '2.403')",
+   "True"
+  ],
+  [
+   "start: folds (results)",
+   "1.663 / 3.052",
+   "1.663 / 3.052",
+   "True"
+  ],
+  [
+   "start: Maxwell point, closed form",
+   "2.5001 + λ̄/2",
+   "2.5001 + λ̄/2",
+   "True"
+  ],
+  [
+   "start: c-dagger(0.2, 30) (results)",
+   "2.919",
+   "2.919",
+   "True"
+  ],
+  [
+   "start: exit of permissive doctrine at c* (results)",
+   "106.8periods",
+   "106.8periods",
+   "True"
+  ],
+  [
+   "start: fuse",
+   "2periods",
+   "2periods",
+   "True"
+  ]
+ ],
+ "readout": {
+  "r-regime": "multiple",
+  "r-ratio": "1.25λ̄† 2.403",
+  "r-fp": "1.000 · 2.354 · 4.000",
+  "r-mu": "2.354",
+  "r-folds": "1.663 / 3.052",
+  "r-cstar": "2.5001 + λ̄/2",
+  "r-cdag": "2.919",
+  "r-tauL": "106.7periods",
+  "r-tauH": "106.8periods",
+  "r-fuse": "2periods"
+ },
+ "lambar2_maxwell": {
+  "c": 2.000234927126339,
+  "closed": false
+ }
+}
