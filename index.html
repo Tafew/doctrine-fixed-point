@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interactive companion to 'Doctrine as a Fixed Point': the enforceable penalty multiple as a fixed point of the doctrine map, with folds, Maxwell point and escape times.">
+<title>Penalty Ceiling Explorer</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;1,400&display=swap">
+<style>
+:root{
+  --surface:#fbfbfa; --panel:#ffffff; --sunken:#f2f2ef;
+  --ink:#141412; --ink-2:#55544e; --ink-3:#87867e;
+  --rule:#dcdbd5; --rule-soft:#ebeae5;
+  --blue:#2a78d6; --orange:#eb6834; --aqua:#1baf7a;
+  --band:#eaf1fb; --band-2:#fdeee8; --hatch:#e7e6e0;
+  --good:#0f7a4a; --warn:#9a5b00;
+  --shadow:0 1px 2px rgba(20,20,18,.06), 0 8px 24px -16px rgba(20,20,18,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --surface:#161614; --panel:#1e1e1b; --sunken:#121210;
+    --ink:#f6f5f0; --ink-2:#bab9b0; --ink-3:#8b8a81;
+    --rule:#33322d; --rule-soft:#272621;
+    --blue:#3987e5; --orange:#f07a4a; --aqua:#25c58c;
+    --band:#17253a; --band-2:#33201a; --hatch:#2a2925;
+    --good:#41b57e; --warn:#d09a3c;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface:#161614; --panel:#1e1e1b; --sunken:#121210;
+  --ink:#f6f5f0; --ink-2:#bab9b0; --ink-3:#8b8a81;
+  --rule:#33322d; --rule-soft:#272621;
+  --blue:#3987e5; --orange:#f07a4a; --aqua:#25c58c;
+  --band:#17253a; --band-2:#33201a; --hatch:#2a2925;
+  --good:#41b57e; --warn:#d09a3c;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--surface); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding-inline:16px; padding-block:28px 56px}
+
+header{border-bottom:1px solid var(--rule); padding-bottom:18px; margin-bottom:22px}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 8px}
+h1{font-family:"IBM Plex Serif",Georgia,serif; font-weight:400; font-size:clamp(25px,4.4vw,36px);
+  line-height:1.15; margin:0 0 10px; text-wrap:balance}
+.lede{margin:0; max-width:68ch; color:var(--ink-2)}
+.lede em, .serif{font-family:"IBM Plex Serif",Georgia,serif}
+
+.presets{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center}
+.presets .lbl{font-size:12px; color:var(--ink-3); margin-right:2px; min-width:10.5em}
+button.chip{font:inherit; font-size:12.5px; padding:5px 11px; border-radius:999px; border:1px solid var(--rule);
+  background:var(--panel); color:var(--ink-2); cursor:pointer; transition:border-color .12s,color .12s,background .12s}
+button.chip:hover{border-color:var(--ink-3); color:var(--ink)}
+button.chip[aria-pressed="true"]{border-color:var(--blue); color:var(--blue); background:var(--band)}
+button.chip:focus-visible{outline:2px solid var(--blue); outline-offset:2px}
+
+.grid{display:grid; grid-template-columns:280px minmax(0,1fr); gap:22px; align-items:start}
+@media (max-width:880px){ .grid{grid-template-columns:minmax(0,1fr)} }
+.panel{background:var(--panel); border:1px solid var(--rule); border-radius:10px; box-shadow:var(--shadow)}
+.controls{padding:16px 16px 18px; position:sticky; top:env(safe-area-inset-top,0px)}
+@media (max-width:880px){ .controls{position:static} }
+.controls h2{font-size:12px; letter-spacing:.07em; text-transform:uppercase; font-family:"IBM Plex Mono",monospace;
+  font-weight:500; color:var(--ink-3); margin:0 0 14px}
+.ctl{margin-bottom:17px}
+.ctl:last-child{margin-bottom:4px}
+.ctl-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.ctl-name{font-size:13px}
+.ctl-name .sym{font-family:"IBM Plex Serif",Georgia,serif; font-style:italic; font-size:15px}
+.ctl-val{font-family:"IBM Plex Mono",monospace; font-size:13px; font-variant-numeric:tabular-nums}
+.ctl-note{font-size:11.5px; color:var(--ink-3); margin-top:1px; line-height:1.35}
+input[type=range]{width:100%; margin:8px 0 0; accent-color:var(--blue); height:20px}
+input[type=range]:focus-visible{outline:2px solid var(--blue); outline-offset:3px}
+.sep{border:0; border-top:1px solid var(--rule-soft); margin:16px 0 14px}
+
+.readout{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--rule-soft);
+  border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin-bottom:12px}
+.stat{background:var(--panel); padding:10px 13px 11px}
+.stat .k{font-size:11px; color:var(--ink-3); letter-spacing:.02em; display:block; margin-bottom:3px}
+.stat .v{font-family:"IBM Plex Mono",monospace; font-size:16px; font-variant-numeric:tabular-nums; line-height:1.25}
+.stat .u{font-size:11px; color:var(--ink-3); margin-left:3px; font-family:"IBM Plex Sans",sans-serif}
+.pill{display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:2px 8px; border-radius:999px;
+  font-family:"IBM Plex Sans",sans-serif}
+.pill.multi{background:var(--band-2); color:var(--warn)}
+.pill.single{background:var(--band); color:var(--blue)}
+.pill .dot{width:6px; height:6px; border-radius:50%; background:currentColor; flex:none}
+.notice{font-size:12.5px; color:var(--warn); background:var(--band-2); border-radius:8px; padding:8px 12px; margin:0 0 16px}
+
+.charts{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px}
+@media (max-width:720px){ .charts{grid-template-columns:minmax(0,1fr)} }
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:14px 14px 10px; box-shadow:var(--shadow)}
+.card h3{font-size:13px; font-weight:600; margin:0 0 2px}
+.card p.cap{font-size:11.5px; color:var(--ink-3); margin:0 0 10px; line-height:1.4}
+.card.wide{grid-column:1/-1; margin-top:18px}
+.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.scroll svg{min-width:640px}
+svg{display:block; width:100%; height:auto; overflow:visible; touch-action:pan-y}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; font-size:12px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.swatch{width:14px; height:2.5px; border-radius:2px; flex:none}
+.swatch.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)}
+.swatch.box{height:10px; width:12px; border-radius:2px}
+
+.foot{margin-top:30px; padding-top:16px; border-top:1px solid var(--rule); font-size:12.5px; color:var(--ink-3); max-width:80ch}
+.foot p{margin:0 0 8px}
+.foot code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:var(--sunken); padding:1px 5px; border-radius:4px}
+.foot a{color:var(--blue)}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Companion instrument &middot; Paper 6, version 6</p>
+  <h1>Penalty Ceiling Explorer</h1>
+  <p class="lede">The enforceable multiple of actual loss is not a legal datum. It is a fixed point of
+  <em>D</em>(<em>m</em>) = 1 + &lambda;&#772;&thinsp;<em>F</em>(<em>m</em>): a clause is worth the doctrinal
+  maximum when a court recognises the interest it protects, and courts recognise it in the share
+  <em>F</em>(<em>m</em>) of cases whose separation threshold
+  <em>m</em><sub>crit</sub> = 1/(&theta;<sub>0</sub>(1&minus;&xi;&kappa;&#772;)) lies below the multiple the
+  market expects. <em>F</em> is the paper's own case population, computed exactly. No case separates at
+  compensation, so <em>m</em> = 1 is always an equilibrium; move the parameters and watch a permissive
+  equilibrium appear, split off its watershed, and fall off its fold.</p>
+  <div class="presets" role="group" aria-label="Jurisdiction presets">
+    <span class="lbl">Calibrated jurisdictions:</span>
+    <button class="chip" type="button" data-lam="0">United States</button>
+    <button class="chip" type="button" data-lam="1">Austria</button>
+    <button class="chip" type="button" data-lam="3">England &amp; India</button>
+    <button class="chip" type="button" data-lam="24">Germany (negotiated)</button>
+  </div>
+  <div class="presets" role="group" aria-label="Position presets">
+    <span class="lbl">Positions in <span class="serif"><em>c</em></span>:</span>
+    <button class="chip" type="button" data-c="2.1349">Baseline 2.135</button>
+    <button class="chip" type="button" data-c="2.5">Maxwell point 2.50</button>
+    <button class="chip" type="button" data-c="2.92">Near the fold 2.92</button>
+  </div>
+</header>
+
+<div class="grid">
+  <aside class="panel controls">
+    <h2>Parameters</h2>
+    <div class="ctl">
+      <div class="ctl-head"><span class="ctl-name"><span class="sym">&lambda;&#772;</span>&nbsp; doctrinal uplift</span>
+        <span class="ctl-val" id="v-lam">3.00</span></div>
+      <div class="ctl-note">How far above actual loss a recognised clause is enforced. Read off decided cases.</div>
+      <input type="range" id="s-lam" min="0" max="26" step="0.1" value="3" aria-label="doctrinal uplift">
+    </div>
+    <div class="ctl">
+      <div class="ctl-head"><span class="ctl-name"><span class="sym">c</span>&nbsp; mean case threshold</span>
+        <span class="ctl-val" id="v-c">2.500</span></div>
+      <div class="ctl-note">Location of the case population. Rises when provability &theta;<sub>0</sub> falls or model sharing &xi;&kappa;&#772; rises.</div>
+      <input type="range" id="s-c" min="1.30" max="4.00" step="0.005" value="2.5" aria-label="mean case threshold">
+    </div>
+    <div class="ctl">
+      <div class="ctl-head"><span class="ctl-name">sharing range, half-width</span>
+        <span class="ctl-val" id="v-h">0.20</span></div>
+      <div class="ctl-note">Shape of the population: &xi;&kappa;&#772; uniform on 0.40 &plusmn; this, &theta;<sub>0</sub> on {0.78, 0.80, 0.82, 0.85}.</div>
+      <input type="range" id="s-h" min="0.05" max="0.25" step="0.005" value="0.20" aria-label="sharing range half-width">
+    </div>
+    <div class="ctl">
+      <div class="ctl-head"><span class="ctl-name"><span class="sym">&sigma;</span>&nbsp; common noise</span>
+        <span class="ctl-val" id="v-sg">0.20</span></div>
+      <div class="ctl-note">Coordinated revisions of standard forms. Sets the two clocks.</div>
+      <input type="range" id="s-sg" min="0.05" max="0.60" step="0.005" value="0.20" aria-label="noise">
+    </div>
+    <hr class="sep">
+    <div class="ctl">
+      <div class="ctl-head"><span class="ctl-name"><span class="sym">&ell;</span><sub>1</sub>&nbsp; depth of a cover shock</span>
+        <span class="ctl-val" id="v-l1">1.50</span></div>
+      <div class="ctl-note">Solvency ratio while insurance cover is withdrawn. Sets the fuse.</div>
+      <input type="range" id="s-l1" min="0.60" max="3.50" step="0.005" value="1.50" aria-label="shock depth">
+    </div>
+  </aside>
+
+  <main>
+    <div class="readout">
+      <div class="stat"><span class="k">Regime</span><span class="v" id="r-regime">&mdash;</span></div>
+      <div class="stat"><span class="k">&lambda;&#772; / &lambda;&#772;<sup>&dagger;</sup></span><span class="v" id="r-ratio">&mdash;</span></div>
+      <div class="stat"><span class="k">Equilibria</span><span class="v" id="r-fp">&mdash;</span></div>
+      <div class="stat"><span class="k">Watershed <em>m</em><sub>u</sub></span><span class="v" id="r-mu">&mdash;</span></div>
+      <div class="stat"><span class="k">Folds <em>c</em>&#817; / <em>c&#772;</em></span><span class="v" id="r-folds">&mdash;</span></div>
+      <div class="stat"><span class="k">Maxwell point <em>c</em>*</span><span class="v" id="r-cstar">&mdash;</span></div>
+      <div class="stat"><span class="k">Policy threshold <em>c</em><sup>&dagger;</sup>(&sigma;, 30)</span><span class="v" id="r-cdag">&mdash;</span></div>
+      <div class="stat"><span class="k">Recovery of the permissive doctrine</span><span class="v" id="r-tauL">&mdash;</span></div>
+      <div class="stat"><span class="k">Exit of the permissive doctrine</span><span class="v" id="r-tauH">&mdash;</span></div>
+      <div class="stat"><span class="k">Fuse <em>t</em>*(&ell;<sub>1</sub>)</span><span class="v" id="r-fuse">&mdash;</span></div>
+    </div>
+    <p class="notice" id="notice" hidden></p>
+
+    <div class="charts">
+      <section class="card">
+        <h3>The doctrine map</h3>
+        <p class="cap">Where the curve meets the 45&deg; line, expectation and enforcement agree. Filled dots are
+        stable, hollow dots are watersheds; the band marks the support of the case population.</p>
+        <svg id="map" viewBox="0 0 400 300" role="img" aria-label="Doctrine map against the 45 degree line"></svg>
+        <div class="legend">
+          <span><i class="swatch" style="background:var(--blue)"></i>D(m)</span>
+          <span><i class="swatch dash" style="color:var(--ink-3)"></i>45&deg;</span>
+          <span><i class="swatch box" style="background:var(--band-2)"></i>basin of compensation</span>
+          <span><i class="swatch box" style="background:var(--hatch)"></i>case population</span>
+        </div>
+      </section>
+      <section class="card">
+        <h3>The doctrinal potential</h3>
+        <p class="cap">Wells are equilibria; the ridge between them is the barrier an accident must clear. Both
+        wells sit on the edges of the doctrinal range when the population lies inside it.</p>
+        <svg id="pot" viewBox="0 0 400 300" role="img" aria-label="Doctrinal potential with wells and barriers"></svg>
+        <div class="legend">
+          <span><i class="swatch" style="background:var(--aqua)"></i>U(m)</span>
+          <span><i class="swatch" style="background:var(--orange)"></i>barrier out of compensation</span>
+          <span><i class="swatch" style="background:var(--blue)"></i>barrier out of the permissive well</span>
+        </div>
+      </section>
+    </div>
+
+    <section class="card wide">
+      <h3>The fold in <em>c</em></h3>
+      <p class="cap">Equilibrium ceiling as the case population shifts. Between the folds the map carries two stable
+      answers and history decides. Hatched: the population would contain cases below one, which Definition 1 rules
+      out &mdash; the lower fold lies there.</p>
+      <div class="scroll"><svg id="bif" viewBox="0 0 800 270" role="img" aria-label="Equilibrium ceiling as a function of c"></svg></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--blue)"></i>greatest equilibrium</span>
+        <span><i class="swatch dash" style="color:var(--orange)"></i>least equilibrium</span>
+        <span><i class="swatch" style="background:var(--ink-3)"></i>current <em>c</em></span>
+        <span><i class="swatch dash" style="color:var(--aqua)"></i>Maxwell <em>c</em>*</span>
+        <span><i class="swatch dash" style="color:var(--warn)"></i><em>c</em><sup>&dagger;</sup>(&sigma;, 30)</span>
+      </div>
+    </section>
+
+    <section class="card wide">
+      <h3>The fuse</h3>
+      <p class="cap">Minimal duration after which a cover withdrawal of depth &ell;<sub>1</sub> becomes irreversible,
+      at adjustment speed &eta; = 0.5. Two periods for a deep shock; without bound as &ell;<sub>1</sub> approaches the
+      watershed. A shock that keeps &ell;<sub>1</sub> above the watershed is reversed at any duration.</p>
+      <div class="scroll"><svg id="fuse" viewBox="0 0 800 230" role="img" aria-label="Minimal shock duration against shock depth"></svg></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--orange)"></i><em>t</em>*(&ell;<sub>1</sub>)</span>
+        <span><i class="swatch box" style="background:var(--band)"></i>reversed at any duration</span>
+        <span><i class="swatch" style="background:var(--ink-3)"></i>current &ell;<sub>1</sub></span>
+      </div>
+    </section>
+
+    <div class="foot">
+      <p><strong>What is computed.</strong> <code>F</code> is the exact distribution of
+      <code>m_crit = 1/(&theta;0(1&minus;&xi;&kappa;&#772;))</code> with &theta;0 equiprobable on {0.78, 0.80, 0.82,
+      0.85} and &xi;&kappa;&#772; uniform on the sharing range, shifted so that its mean is <code>c</code>; the
+      potential <code>U</code> is its closed-form integral. Recovery and exit times are exact first-passage
+      quadratures of the perturbed adjustment with reflection at 1 and 1+&lambda;&#772; (not the Kramers
+      approximation), in periods, to be read as orders of magnitude. Adjustment speed <code>&eta; = 0.5</code>.
+      The folds are computed from <code>g0(u) = 1 + &lambda;&#772;F0(u) &minus; u</code>; <code>c*</code> is
+      <code>1 + &lambda;&#772;/2</code> whenever the population lies inside the doctrinal range there, and found
+      numerically otherwise; <code>c&dagger;</code> is where the expected exit time of the permissive doctrine equals
+      30 periods.</p>
+      <p><strong>Version.</strong> Version 6 of the paper (September 2026) replaced the logistic stand-in of earlier
+      versions by this population, which moved the watershed from 1.95 to 1.77 and made negotiated German contracting
+      multiple rather than determinate; this page was rebuilt on it and reproduces the paper's numbers at printed
+      precision. The page is a companion, not the source of record: every number in the paper comes from
+      <code>population.py</code>, <code>make_doctrine.py</code> and <code>make_stochastic.py</code> in the replication
+      package, <a href="https://doi.org/10.6084/m9.figshare.33212916">doi:10.6084/m9.figshare.33212916</a> (version 6
+      of the package is to be deposited as a new version of that record).</p>
+      <p><strong>Cite.</strong> Companion to Andreas Bauer, <em>Doctrine as a Fixed Point: A Formal Model of the
+      Enforceable Penalty Ceiling when Human Oversight of AI Must Remain Effective</em>, working paper, version 6,
+      September 2026. Source and verification script:
+      <a href="https://github.com/Tafew/doctrine-fixed-point">github.com/Tafew/doctrine-fixed-point</a>; licensed
+      <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
+    </div>
+  </main>
+</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TH = [0.78, 0.80, 0.82, 0.85], ETA = 0.5, MID = 0.40, HORIZON = 30;
+  var P = { lam: 3, c: 2.5, h: 0.20, sg: 0.20, l1: 1.50 };   // opens at England & India, Maxwell point
+
+  // ------------------------------------------------------------ population
+  function shape(h){
+    var a = MID - h, b = MID + h, mi = 0, lo = Infinity, hi = -Infinity, seg = [];
+    TH.forEach(function(t){
+      mi += 1 / t;
+      var l = 1 / (t * (1 - a)), u = 1 / (t * (1 - b));
+      lo = Math.min(lo, l); hi = Math.max(hi, u);
+      seg.push({t: t, l: l, u: u});
+    });
+    mi /= TH.length;
+    return {a: a, b: b, seg: seg, lo0: lo, hi0: hi, mean0: mi * Math.log((1 - a) / (1 - b)) / (b - a)};
+  }
+  function pop(h, c){ var s = shape(h); s.s = c - s.mean0; s.lo = s.lo0 + s.s; s.hi = s.hi0 + s.s; return s; }
+  function F0(S, u){
+    var tot = 0, w = S.b - S.a;
+    for (var i = 0; i < S.seg.length; i++){
+      var g = S.seg[i];
+      if (u <= g.l) continue;
+      tot += (u >= g.u) ? 1 : (1 - S.a - 1 / (g.t * u)) / w;
+    }
+    return tot / S.seg.length;
+  }
+  function f0(S, u){
+    var tot = 0, w = S.b - S.a;
+    for (var i = 0; i < S.seg.length; i++){
+      var g = S.seg[i];
+      if (u > g.l && u < g.u) tot += 1 / (w * g.t * u * u);
+    }
+    return tot / S.seg.length;
+  }
+  function IF0(S, u){                      // integral of F0 from -inf to u, closed form
+    var tot = 0, w = S.b - S.a;
+    for (var i = 0; i < S.seg.length; i++){
+      var g = S.seg[i];
+      if (u <= g.l) continue;
+      var top = Math.min(u, g.u);
+      tot += ((1 - S.a) * (top - g.l) - Math.log(top / g.l) / g.t) / w;
+      if (u > g.u) tot += u - g.u;
+    }
+    return tot / S.seg.length;
+  }
+  function M(p){                           // the model at parameters p
+    var S = pop(p.h, p.c), lam = p.lam;
+    var o = {S: S, lam: lam};
+    o.F = function(m){ return F0(S, m - S.s); };
+    o.D = function(m){ return 1 + lam * o.F(m); };
+    o.G = function(m){ return o.D(m) - m; };
+    o.U = function(m){ return -ETA * ((m - 1) + lam * (IF0(S, m - S.s) - IF0(S, 1 - S.s)) - (m * m - 1) / 2); };
+    o.Dp = function(m){ return lam * f0(S, m - S.s); };
+    return o;
+  }
+
+  // ------------------------------------------------------------ fixed points
+  function fixedPoints(o, N){
+    N = N || 4000;
+    if (o.lam <= 1e-12) return [{m: 1, st: true}];
+    var lo = 1, hi = 1 + o.lam, out = [];
+    var gl = o.G(lo);
+    if (gl === 0) out.push(lo);
+    var pm = lo, pg = gl;
+    for (var i = 1; i <= N; i++){
+      var m = (i === N) ? hi : lo + (hi - lo) * i / N, g = o.G(m);
+      if (pg * g < 0){
+        var a = pm, b = m, ga = pg;
+        for (var k = 0; k < 70; k++){ var mid = 0.5 * (a + b), gm = o.G(mid); if (ga * gm <= 0) b = mid; else { a = mid; ga = gm; } }
+        out.push(0.5 * (a + b));
+      }
+      pm = m; pg = g;
+    }
+    if (o.G(hi) === 0) out.push(hi);
+    var d = 1e-7 * (1 + o.lam), res = [];
+    out.sort(function(x, y){ return x - y; }).forEach(function(r){
+      if (res.length && r - res[res.length - 1].m < 1e-9) return;
+      var left = (r - d <= lo) ? true : o.G(r - d) > 0, right = (r + d >= hi) ? true : o.G(r + d) < 0;
+      res.push({m: r, st: left && right});
+    });
+    return res;
+  }
+  function roles(fp){
+    var r = {mL: fp[0].m, mH: fp[fp.length - 1].m, multi: fp.length >= 3, mu: null};
+    if (r.multi){ for (var i = fp.length - 2; i >= 0; i--) if (!fp[i].st){ r.mu = fp[i].m; break; } }
+    return r;
+  }
+
+  // ------------------------------------------------------------ thresholds
+  function lambdaDagger(o){
+    var S = o.S, lo = Math.max(S.lo, 1), hi = S.hi;
+    if (o.F(1) > 0) return 0;
+    var best = Infinity, arg = lo, N = 3000;
+    for (var i = 1; i <= N; i++){
+      var m = lo + (hi - lo) * i / N, F = o.F(m);
+      if (F > 0){ var r = (m - 1) / F; if (r < best){ best = r; arg = m; } }
+    }
+    var a = Math.max(lo, arg - (hi - lo) / N), b = Math.min(hi, arg + (hi - lo) / N);
+    for (var k = 0; k < 80; k++){                 // golden section refinement
+      var x1 = b - 0.618034 * (b - a), x2 = a + 0.618034 * (b - a);
+      var r1 = (x1 - 1) / Math.max(o.F(x1), 1e-300), r2 = (x2 - 1) / Math.max(o.F(x2), 1e-300);
+      if (r1 < r2) b = x2; else a = x1;
+    }
+    var mm = 0.5 * (a + b); return Math.min(best, (mm - 1) / Math.max(o.F(mm), 1e-300));
+  }
+  function folds(p){
+    var S = shape(p.h), lam = p.lam, pts = [], N = 20000;
+    for (var i = 0; i <= N; i++) pts.push(S.lo0 + (S.hi0 - S.lo0) * i / N);
+    S.seg.forEach(function(g){ pts.push(g.l, g.u); });
+    pts.sort(function(x, y){ return x - y; });
+    var g0 = function(u){ return 1 + lam * F0(S, u) - u; };
+    var gp = -Infinity, up = S.lo0;
+    pts.forEach(function(u){ var v = g0(u); if (v > gp){ gp = v; up = u; } });
+    var gm = Infinity;
+    pts.forEach(function(u){ if (u <= up){ var v = g0(u); if (v < gm) gm = v; } });
+    if (!(gp > gm + 1e-12)) return null;
+    return {lo: S.mean0 + gm, hi: S.mean0 + gp};
+  }
+  function admissibleEdge(h){ var S = shape(h); return S.mean0 - S.lo0 + 1; }
+
+  // exact mean first passage, log-space (natural log); reflect beyond start
+  function logMFPT(o, sigma, start, target){
+    var lo = 1, hi = 1 + o.lam, N = 6000, s2 = sigma * sigma, pts = [];
+    var up = target > start, a = up ? lo : target, b = up ? target : hi;
+    for (var i = 0; i <= N; i++){ var x = lo + (hi - lo) * i / N; if (x > a + 1e-12 && x < b - 1e-12) pts.push(x); }
+    pts.push(a, b, start);                       // exact end points and start
+    pts.sort(function(x, y){ return x - y; });
+    var X = [], Uv = [];
+    pts.forEach(function(x){ if (!X.length || Math.abs(x - X[X.length - 1]) > 1e-13){ X.push(x); Uv.push(o.U(x)); } });
+    if (!up){ X = X.map(function(x){ return -x; }).reverse(); Uv = Uv.reverse(); start = -start; }
+    var n = X.length; if (n < 3) return -Infinity;
+    var w = Uv.map(function(u){ return -2 * u / s2; }), W = Math.max.apply(null, w);
+    var inner = [0];
+    for (var k = 1; k < n; k++) inner.push(inner[k - 1] + 0.5 * (Math.exp(w[k] - W) + Math.exp(w[k - 1] - W)) * (X[k] - X[k - 1]));
+    var tx = [], tt = [];
+    for (var q = 0; q < n; q++){
+      if (X[q] < start - 1e-12) continue;
+      tx.push(X[q]); tt.push(inner[q] > 0 ? 2 * Uv[q] / s2 + W + Math.log(inner[q]) : -Infinity);
+    }
+    if (tx.length < 2) return -Infinity;
+    var T = Math.max.apply(null, tt), acc = 0;
+    for (var z = 1; z < tx.length; z++) acc += 0.5 * (Math.exp(tt[z] - T) + Math.exp(tt[z - 1] - T)) * (tx[z] - tx[z - 1]);
+    return Math.log(2 / s2) + T + Math.log(acc);
+  }
+  function atC(p, c){ return {lam: p.lam, c: c, h: p.h, sg: p.sg, l1: p.l1}; }
+  function logExitH(p, c){
+    var o = M(atC(p, c)), r = roles(fixedPoints(o, 3000));
+    if (!r.multi || r.mu === null) return -Infinity;
+    return logMFPT(o, p.sg, r.mH, r.mu);
+  }
+  function maxwell(p, fo){
+    if (!(p.lam > 0) || !fo) return null;
+    var S = shape(p.h), cs = 1 + p.lam / 2;
+    if (cs - (S.mean0 - S.lo0) > 1 && cs + (S.hi0 - S.mean0) < 1 + p.lam) return {c: cs, closed: true};
+    var A = function(c){ var o = M(atC(p, c)), fp = fixedPoints(o, 3000); if (fp.length < 3) return null;
+      return -(o.U(fp[fp.length - 1].m) - o.U(fp[0].m)) / ETA; };
+    var a = fo.lo + 1e-4, b = fo.hi - 1e-4, Aa = A(a), Ab = A(b);
+    if (Aa === null || Ab === null || !(Aa > 0 && Ab < 0)) return null;
+    for (var k = 0; k < 50; k++){ var m = 0.5 * (a + b), Am = A(m); if (Am === null) break; if (Am > 0) a = m; else b = m; }
+    return {c: 0.5 * (a + b), closed: false};
+  }
+  function cDagger(p, cs, fo){
+    if (!cs || !fo) return null;
+    var lT = Math.log(HORIZON), a = cs.c + 1e-6, b = fo.hi - 1e-6;
+    var fa = logExitH(p, a) - lT;
+    if (!(fa > 0)) return {c: cs.c, below: true};
+    for (var k = 0; k < 44; k++){ var m = 0.5 * (a + b), fm = logExitH(p, m) - lT; if (fm > 0) a = m; else b = m; }
+    return {c: 0.5 * (a + b), below: false};
+  }
+  function fuse(o, r, l1){
+    if (!r.multi || r.mu === null) return {kind: 'none'};
+    if (l1 >= r.mH) return {kind: 'slack'};
+    if (l1 >= r.mu) return {kind: 'reversed'};
+    var d = o.D(l1);
+    if (!(d < r.mu)) return {kind: 'reversed'};
+    return {kind: 'fuse', t: Math.floor(Math.log((r.mu - d) / (r.mH - d)) / Math.log(1 - ETA)) + 1};
+  }
+
+  // ------------------------------------------------------------ drawing helpers
+  var NS = "http://www.w3.org/2000/svg";
+  function el(t, a){ var n = document.createElementNS(NS, t); for (var k in a) n.setAttribute(k, a[k]); return n; }
+  function clear(s){ while (s.firstChild) s.removeChild(s.firstChild); }
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function fmt(x, d){ return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d); }
+  function text(svg, x, y, s, a){ var t = el('text', Object.assign({x: x, y: y, 'font-size': 10.5, fill: css('--ink-2')}, a || {})); t.textContent = s; svg.appendChild(t); return t; }
+  function ticksFor(a, b, n){
+    var step = (b - a) / n, mag = Math.pow(10, Math.floor(Math.log10(step)));
+    var s = [1, 2, 2.5, 5, 10].map(function(m){ return m * mag; }).filter(function(v){ return v >= step; })[0] || mag * 10;
+    var out = [], v = Math.ceil(a / s) * s;
+    while (v <= b + 1e-9){ out.push(Math.round(v * 1000) / 1000); v += s; }
+    return out;
+  }
+  function axes(svg, box, xd, yd, xlab, ylab, xt, yt){
+    var X = function(v){ return box.l + (v - xd[0]) / (xd[1] - xd[0]) * box.w; };
+    var Y = function(v){ return box.t + box.h - (v - yd[0]) / (yd[1] - yd[0]) * box.h; };
+    yt.forEach(function(t){
+      svg.appendChild(el('line', {x1: box.l, x2: box.l + box.w, y1: Y(t), y2: Y(t), stroke: css('--rule-soft'), 'stroke-width': 1}));
+      text(svg, box.l - 7, Y(t) + 3.5, String(t), {'font-size': 10, fill: css('--ink-3'), 'text-anchor': 'end'});
+    });
+    xt.forEach(function(t){ text(svg, X(t), box.t + box.h + 15, String(t), {'font-size': 10, fill: css('--ink-3'), 'text-anchor': 'middle'}); });
+    svg.appendChild(el('line', {x1: box.l, x2: box.l + box.w, y1: box.t + box.h, y2: box.t + box.h, stroke: css('--rule'), 'stroke-width': 1}));
+    text(svg, box.l + box.w / 2, box.t + box.h + 32, xlab, {'font-size': 11, fill: css('--ink-3'), 'text-anchor': 'middle'});
+    text(svg, 0, 0, ylab, {'font-size': 11, fill: css('--ink-3'), 'text-anchor': 'middle', transform: 'translate(' + (box.l - 36) + ',' + (box.t + box.h / 2) + ') rotate(-90)'});
+    return {X: X, Y: Y};
+  }
+  function path(pts){ return pts.map(function(p, i){ return (i ? 'L' : 'M') + fmt(p[0], 2) + ' ' + fmt(p[1], 2); }).join(' '); }
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+  // hover layer: vertical crosshair + value box, pointer and touch
+  function hover(svg, box, xd, rowsAt){
+    var g = el('g', {'pointer-events': 'none', visibility: 'hidden'}); svg.appendChild(g);
+    var hit = el('rect', {x: box.l, y: box.t, width: box.w, height: box.h, fill: 'transparent'}); svg.appendChild(hit);
+    function show(evt){
+      var pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+      var loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+      var xv = xd[0] + (clamp(loc.x, box.l, box.l + box.w) - box.l) / box.w * (xd[1] - xd[0]);
+      var rows = rowsAt(xv); clear(g);
+      var xp = box.l + (xv - xd[0]) / (xd[1] - xd[0]) * box.w;
+      g.appendChild(el('line', {x1: xp, x2: xp, y1: box.t, y2: box.t + box.h, stroke: css('--ink-3'), 'stroke-width': 1}));
+      rows.forEach(function(r){ if (r.y !== undefined) g.appendChild(el('circle', {cx: xp, cy: r.y, r: 3.6, fill: r.color, stroke: css('--panel'), 'stroke-width': 1.5})); });
+      var w = 8 + 6.3 * Math.max.apply(null, rows.map(function(r){ return r.label.length; })), h = 8 + 14 * rows.length;
+      var bx = (xp + 10 + w < box.l + box.w) ? xp + 10 : xp - 10 - w;
+      g.appendChild(el('rect', {x: bx, y: box.t + 4, width: w, height: h, rx: 5, fill: css('--panel'), stroke: css('--rule'), 'stroke-width': 1}));
+      rows.forEach(function(r, i){ var t = el('text', {x: bx + 7, y: box.t + 17 + 14 * i, 'font-size': 10.5, fill: css('--ink'), 'font-family': 'IBM Plex Mono, monospace'}); t.textContent = r.label; g.appendChild(t); });
+      g.setAttribute('visibility', 'visible');
+    }
+    hit.addEventListener('pointermove', show);
+    hit.addEventListener('pointerdown', show);
+    hit.addEventListener('pointerleave', function(){ g.setAttribute('visibility', 'hidden'); });
+  }
+
+  // ------------------------------------------------------------ charts
+  function drawMap(o, fp, r){
+    var svg = document.getElementById('map'); clear(svg);
+    var box = {l: 48, t: 12, w: 334, h: 244}, hi = 1 + Math.max(o.lam, 0.6);
+    var pad = (hi - 1) * 0.08 + 0.05, xd = [1 - pad, hi + pad], yd = xd;
+    var ax = axes(svg, box, xd, yd, 'anticipated multiple  m', 'enforced multiple  D(m)', ticksFor(xd[0], xd[1], 4), ticksFor(yd[0], yd[1], 4));
+    var sl = clamp(o.S.lo, xd[0], xd[1]), sh = clamp(o.S.hi, xd[0], xd[1]);
+    if (sh > sl) svg.appendChild(el('rect', {x: ax.X(sl), y: box.t + box.h - 7, width: ax.X(sh) - ax.X(sl), height: 7, fill: css('--hatch')}));
+    if (r.multi && r.mu !== null) svg.appendChild(el('rect', {x: ax.X(1), y: box.t, width: Math.max(0, ax.X(r.mu) - ax.X(1)), height: box.h - 7, fill: css('--band-2'), opacity: .8}));
+    svg.appendChild(el('path', {d: path([[ax.X(xd[0]), ax.Y(xd[0])], [ax.X(xd[1]), ax.Y(xd[1])]]), stroke: css('--ink-3'), 'stroke-width': 1.4, 'stroke-dasharray': '4 3', fill: 'none'}));
+    var pts = []; for (var i = 0; i <= 400; i++){ var m = Math.max(1, xd[0]) + (xd[1] - Math.max(1, xd[0])) * i / 400; pts.push([ax.X(m), ax.Y(o.D(m))]); }
+    svg.appendChild(el('path', {d: path(pts), stroke: css('--blue'), 'stroke-width': 2.4, fill: 'none', 'stroke-linejoin': 'round'}));
+    fp.forEach(function(f){
+      svg.appendChild(el('circle', {cx: ax.X(f.m), cy: ax.Y(f.m), r: 5.2, fill: f.st ? css('--ink') : css('--panel'), stroke: f.st ? css('--panel') : css('--ink'), 'stroke-width': f.st ? 2 : 1.8}));
+    });
+    var labelled = [];
+    fp.forEach(function(f){
+      if (labelled.some(function(v){ return Math.abs(ax.X(v) - ax.X(f.m)) < 26; })) return;
+      labelled.push(f.m);
+      var right = ax.X(f.m) + 40 < box.l + box.w;
+      text(svg, ax.X(f.m) + (right ? 9 : -9), Math.min(ax.Y(f.m) + 17, box.t + box.h - 10), fmt(f.m, 2), {'text-anchor': right ? 'start' : 'end'});
+    });
+    hover(svg, box, xd, function(m){
+      m = Math.max(m, 1);
+      return [{label: 'm    ' + fmt(m, 3)}, {label: 'D(m) ' + fmt(o.D(m), 3), y: ax.Y(o.D(m)), color: css('--blue')},
+              {label: 'F(m) ' + fmt(o.F(m), 3) + ' recognised'}];
+    });
+  }
+
+  function drawPot(o, fp, r){
+    var svg = document.getElementById('pot'); clear(svg);
+    var box = {l: 54, t: 12, w: 328, h: 244}, hi = 1 + Math.max(o.lam, 0.6), N = 500, xs = [], us = [];
+    for (var i = 0; i <= N; i++){ var x = 1 + (hi - 1) * i / N; xs.push(x); us.push(o.U(x)); }
+    var lo = Math.min.apply(null, us), up = Math.max.apply(null, us); if (up - lo < 1e-9) up = lo + 1;
+    var rng = up - lo, xd = [1, hi], yd = [lo - rng * 0.1, up + rng * 0.24];
+    var ax = axes(svg, box, xd, yd, 'multiple  m', 'potential  U(m)', ticksFor(xd[0], xd[1], 4), ticksFor(yd[0], yd[1], 4));
+    svg.appendChild(el('path', {d: path(xs.map(function(x, k){ return [ax.X(x), ax.Y(us[k])]; })), stroke: css('--aqua'), 'stroke-width': 2.4, fill: 'none'}));
+    if (r.multi && r.mu !== null){
+      var yL = o.U(r.mL), yU = o.U(r.mu), yH = o.U(r.mH);
+      var xa = ax.X(r.mu);
+      svg.appendChild(el('line', {x1: xa - 3, x2: xa - 3, y1: ax.Y(yL), y2: ax.Y(yU), stroke: css('--orange'), 'stroke-width': 2.4, 'stroke-linecap': 'round'}));
+      svg.appendChild(el('line', {x1: xa + 3, x2: xa + 3, y1: ax.Y(yH), y2: ax.Y(yU), stroke: css('--blue'), 'stroke-width': 2.4, 'stroke-linecap': 'round'}));
+      var bx = clamp(xa, box.l + 60, box.l + box.w - 60);
+      text(svg, bx, ax.Y(yU) - 18, 'ΔU out of compensation ' + fmt(yU - yL, 4), {'text-anchor': 'middle', fill: css('--orange')});
+      text(svg, bx, ax.Y(yU) - 6, 'ΔU out of the permissive well ' + fmt(yU - yH, 4), {'text-anchor': 'middle', fill: css('--blue')});
+    }
+    fp.forEach(function(f){ if (f.st) svg.appendChild(el('circle', {cx: ax.X(f.m), cy: ax.Y(o.U(f.m)), r: 4.6, fill: css('--ink'), stroke: css('--panel'), 'stroke-width': 2})); });
+    hover(svg, box, xd, function(m){ return [{label: 'm    ' + fmt(m, 3)}, {label: 'U(m) ' + fmt(o.U(m), 4), y: ax.Y(o.U(m)), color: css('--aqua')}]; });
+  }
+
+  var bifCache = {key: null, rows: null};
+  function drawBif(p, fo, cs, cd){
+    var svg = document.getElementById('bif'); clear(svg);
+    var box = {l: 56, t: 14, w: 716, h: 206}, hi = 1 + Math.max(p.lam, 0.6);
+    var cLo = 1.3, cHi = Math.min(26, Math.max(3.8, fo ? fo.hi + 0.35 : 3.8));
+    var xd = [cLo, cHi], yd = [0.92 - 0.04 * (hi - 1), hi + 0.45 * (hi - 1) + 0.2];
+    var ax = axes(svg, box, xd, yd, 'mean case threshold  c', 'equilibrium ceiling  m*', ticksFor(cLo, cHi, 8), ticksFor(yd[0], yd[1], 4));
+    var edge = admissibleEdge(p.h);
+    if (edge > cLo){
+      var pid = 'hatch-bif';
+      var defs = el('defs', {}), pat = el('pattern', {id: pid, width: 7, height: 7, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)'});
+      pat.appendChild(el('rect', {width: 7, height: 7, fill: css('--panel')}));
+      pat.appendChild(el('line', {x1: 0, y1: 0, x2: 0, y2: 7, stroke: css('--hatch'), 'stroke-width': 3}));
+      defs.appendChild(pat); svg.appendChild(defs);
+      svg.appendChild(el('rect', {x: ax.X(cLo), y: box.t, width: ax.X(Math.min(edge, cHi)) - ax.X(cLo), height: box.h, fill: 'url(#' + pid + ')'}));
+    }
+    var key = [p.lam, p.h, cLo, cHi].join('|'), rows;
+    if (bifCache.key === key) rows = bifCache.rows;
+    else {
+      rows = []; var N = 360;
+      for (var i = 0; i <= N; i++){
+        var cc = cLo + (cHi - cLo) * i / N, f = fixedPoints(M(atC(p, cc)), 1500);
+        rows.push({c: cc, lo: f[0].m, hi: f[f.length - 1].m});
+      }
+      bifCache = {key: key, rows: rows};
+    }
+    svg.appendChild(el('path', {d: path(rows.map(function(q){ return [ax.X(q.c), ax.Y(q.lo)]; })), stroke: css('--orange'), 'stroke-width': 2.2, fill: 'none', 'stroke-dasharray': '6 4'}));
+    svg.appendChild(el('path', {d: path(rows.map(function(q){ return [ax.X(q.c), ax.Y(q.hi)]; })), stroke: css('--blue'), 'stroke-width': 2.2, fill: 'none'}));
+    function vline(c, color, dash, label, row){
+      if (!(c >= cLo && c <= cHi)) return;
+      svg.appendChild(el('line', {x1: ax.X(c), x2: ax.X(c), y1: box.t, y2: box.t + box.h, stroke: color, 'stroke-width': 1.3, 'stroke-dasharray': dash || ''}));
+      var right = ax.X(c) + 96 < box.l + box.w;
+      text(svg, ax.X(c) + (right ? 6 : -6), box.t + 12 + 13 * row, label, {fill: color, 'text-anchor': right ? 'start' : 'end'});
+    }
+    if (fo){ vline(fo.lo, css('--ink-3'), '2 3', 'fold ' + fmt(fo.lo, 2), 1); vline(fo.hi, css('--ink-3'), '2 3', 'fold ' + fmt(fo.hi, 2), 1); }
+    if (cs) vline(cs.c, css('--aqua'), '5 3', 'Maxwell ' + fmt(cs.c, 2), 2);
+    if (cd && !cd.below) vline(cd.c, css('--warn'), '5 3', 'c† ' + fmt(cd.c, 2), 3);
+    vline(p.c, css('--ink-2'), '', 'c = ' + fmt(p.c, 3), 0);
+    hover(svg, box, xd, function(c){
+      var q = rows[Math.round((c - cLo) / (cHi - cLo) * (rows.length - 1))];
+      return [{label: 'c        ' + fmt(c, 3)}, {label: 'greatest ' + fmt(q.hi, 3), y: ax.Y(q.hi), color: css('--blue')},
+              {label: 'least    ' + fmt(q.lo, 3), y: ax.Y(q.lo), color: css('--orange')}];
+    });
+  }
+
+  function drawFuse(o, r, p){
+    var svg = document.getElementById('fuse'); clear(svg);
+    var box = {l: 56, t: 12, w: 716, h: 168};
+    if (!r.multi || r.mu === null){
+      text(svg, box.l + box.w / 2, box.t + box.h / 2, 'No permissive equilibrium at these parameters, so there is nothing for a shock to destroy.', {'text-anchor': 'middle', fill: css('--ink-3'), 'font-size': 12});
+      return;
+    }
+    var TMAX = 20, xLo = 0.6, xHi = Math.max(r.mu + 0.35, Math.min(r.mH, 3.5));
+    var xd = [xLo, xHi], yd = [0, TMAX];
+    var ax = axes(svg, box, xd, yd, 'depth of the cover shock  ℓ₁ (solvency ratio)', 'minimal duration  t* (periods)', ticksFor(xLo, xHi, 8), [0, 5, 10, 15, 20]);
+    svg.appendChild(el('rect', {x: ax.X(r.mu), y: box.t, width: ax.X(xHi) - ax.X(r.mu), height: box.h, fill: css('--band')}));
+    var wr = ax.X(r.mu) + 160 < box.l + box.w;
+    text(svg, ax.X(r.mu) + (wr ? 7 : -7), box.t + (wr ? 14 : 48), 'watershed m\u1d64 = ' + fmt(r.mu, 3), {fill: css('--blue'), 'text-anchor': wr ? 'start' : 'end'});
+    var pts = [], N = 700, prev = null;
+    for (var i = 0; i <= N; i++){
+      var l = xLo + (r.mu - 1e-6 - xLo) * i / N, fz = fuse(o, r, l);
+      if (fz.kind !== 'fuse') continue;
+      var t = Math.min(fz.t, TMAX + 1);
+      if (prev !== null && prev !== t) pts.push([ax.X(l), ax.Y(Math.min(prev, TMAX))]);
+      pts.push([ax.X(l), ax.Y(Math.min(t, TMAX))]); prev = t;
+    }
+    svg.appendChild(el('path', {d: path(pts), stroke: css('--orange'), 'stroke-width': 2.2, fill: 'none'}));
+    text(svg, ax.X(r.mu) - 6, box.t + 30, '→ ∞', {fill: css('--orange'), 'text-anchor': 'end', 'font-size': 12});
+    var lx = clamp(p.l1, xLo, xHi);
+    svg.appendChild(el('line', {x1: ax.X(lx), x2: ax.X(lx), y1: box.t, y2: box.t + box.h, stroke: css('--ink-2'), 'stroke-width': 1.4}));
+    hover(svg, box, xd, function(l){
+      var fz = fuse(o, r, l), lab = fz.kind === 'fuse' ? 't*   ' + fz.t + (fz.t === 1 ? ' period' : ' periods') : 'reversed at any duration';
+      return [{label: 'ℓ₁   ' + fmt(l, 3)}, {label: lab, y: fz.kind === 'fuse' ? ax.Y(Math.min(fz.t, TMAX)) : undefined, color: css('--orange')}];
+    });
+  }
+
+  // ------------------------------------------------------------ readout
+  function periods(lt){
+    if (!isFinite(lt)) return '—';
+    var l10 = lt / Math.LN10;
+    return l10 < 5 ? fmt(Math.exp(lt), 0) + '<span class="u">periods</span>' : '10<sup>' + fmt(l10, 1) + '</sup><span class="u">periods</span>';
+  }
+  function render(){
+    var p = P, o = M(p), fp = fixedPoints(o), r = roles(fp);
+    document.getElementById('v-lam').textContent = fmt(p.lam, 2);
+    document.getElementById('v-c').textContent = fmt(p.c, 3);
+    document.getElementById('v-h').textContent = fmt(p.h, 3);
+    document.getElementById('v-sg').textContent = fmt(p.sg, 3);
+    document.getElementById('v-l1').textContent = fmt(p.l1, 3);
+
+    var ld = lambdaDagger(o), fo = folds(p), cs = maxwell(p, fo), cd = cDagger(p, cs, fo);
+    var comp = fp[0].m === 1;
+    var regime = r.multi ? 'multiple' : (comp ? 'determinate at 1' : 'determinate');
+    document.getElementById('r-regime').innerHTML = '<span class="pill ' + (r.multi ? 'multi' : 'single') + '"><span class="dot"></span>' + regime + '</span>';
+    document.getElementById('r-ratio').innerHTML = ld > 0 ? fmt(p.lam / ld, 2) + '<span class="u">&lambda;&#772;&dagger; ' + fmt(ld, 3) + '</span>' : '—';
+    document.getElementById('r-fp').textContent = fp.map(function(f){ return fmt(f.m, f.m >= 10 ? 1 : 3); }).join(' · ');
+    document.getElementById('r-mu').textContent = r.mu !== null ? fmt(r.mu, 3) : '—';
+    document.getElementById('r-folds').textContent = fo ? fmt(fo.lo, 3) + ' / ' + fmt(fo.hi, 3) : '—';
+    document.getElementById('r-cstar').innerHTML = cs ? fmt(cs.c, 3) + '<span class="u">' + (cs.closed ? '1 + λ̄/2' : 'numerical') + '</span>' : '—';
+    document.getElementById('r-cdag').innerHTML = !cd ? '—' : (cd.below ? '≤ c*<span class="u">exit within 30 already</span>' : fmt(cd.c, 3));
+    var tl = (r.multi && r.mu !== null) ? logMFPT(o, p.sg, r.mL, r.mu) : NaN;
+    var th = (r.multi && r.mu !== null) ? logMFPT(o, p.sg, r.mH, r.mu) : NaN;
+    document.getElementById('r-tauL').innerHTML = periods(tl);
+    document.getElementById('r-tauH').innerHTML = periods(th);
+    var fz = fuse(o, r, p.l1);
+    document.getElementById('r-fuse').innerHTML = fz.kind === 'fuse' ? fz.t + '<span class="u">' + (fz.t === 1 ? 'period' : 'periods') + '</span>'
+      : fz.kind === 'reversed' ? '∞<span class="u">reversed at any duration</span>'
+      : fz.kind === 'slack' ? '<span class="u">shock does not bind</span>' : '—';
+
+    var note = document.getElementById('notice');
+    if (o.S.lo < 1){
+      note.hidden = false;
+      note.textContent = 'At this c the population would contain cases with a threshold below one (lowest ' + fmt(o.S.lo, 3) +
+        '), which requires provability at or above certainty. Definition 1 rules this out; compensation is then no longer an equilibrium. The admissible range starts at c = ' + fmt(admissibleEdge(p.h), 4) + '.';
+    } else note.hidden = true;
+
+    drawMap(o, fp, r); drawPot(o, fp, r); drawBif(p, fo, cs, cd); drawFuse(o, r, p);
+    syncChips();
+  }
+
+  // ------------------------------------------------------------ wiring
+  var ids = [['s-lam', 'lam'], ['s-c', 'c'], ['s-h', 'h'], ['s-sg', 'sg'], ['s-l1', 'l1']];
+  var pending = false;
+  function schedule(){ if (pending) return; pending = true; requestAnimationFrame(function(){ pending = false; render(); }); }
+  ids.forEach(function(pair){
+    var node = document.getElementById(pair[0]);
+    node.addEventListener('input', function(){ P[pair[1]] = parseFloat(node.value); schedule(); });
+  });
+  var chips = Array.prototype.slice.call(document.querySelectorAll('button.chip'));
+  function syncChips(){
+    chips.forEach(function(ch){
+      var on = ch.dataset.lam !== undefined ? Math.abs(parseFloat(ch.dataset.lam) - P.lam) < 0.051
+                                            : Math.abs(parseFloat(ch.dataset.c) - P.c) < 0.003;
+      ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  chips.forEach(function(ch){
+    ch.addEventListener('click', function(){
+      if (ch.dataset.lam !== undefined){ P.lam = parseFloat(ch.dataset.lam); document.getElementById('s-lam').value = P.lam; }
+      else { P.c = parseFloat(ch.dataset.c); document.getElementById('s-c').value = P.c; }
+      render();
+    });
+  });
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  if (mq.addEventListener) mq.addEventListener('change', render);
+  new MutationObserver(render).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+  // exposed for the verification script; not used by the page
+  window.__p6 = {M: M, fixedPoints: fixedPoints, roles: roles, lambdaDagger: lambdaDagger, folds: folds,
+    maxwell: maxwell, cDagger: cDagger, logMFPT: logMFPT, fuse: fuse, admissibleEdge: admissibleEdge, atC: atC};
+  render();
+})();
+</script>
+</body>
+</html>
