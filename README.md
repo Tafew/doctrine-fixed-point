@@ -30,9 +30,9 @@ The paper's baseline, c = 2.1349, is one click away.
 
 The page is a companion, not the source of record. Every number in the paper comes from
 `population.py`, `make_doctrine.py` and `make_stochastic.py` in the replication package,
-[doi:10.6084/m9.figshare.33212916](https://doi.org/10.6084/m9.figshare.33212916). Version 6 of
-that package is to be deposited as a new version of the record; until then the DOI serves
-version 5, whose numbers differ (the paper's Appendix B lists every change).
+[doi:10.6084/m9.figshare.33212916](https://doi.org/10.6084/m9.figshare.33212916). The version 6
+package goes into that record as a new version; its versions 1-2 hold the package of the August
+2026 working paper, whose numbers differ.
 
 ## Verification
 
